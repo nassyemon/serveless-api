@@ -1,0 +1,13 @@
+{
+  "name": "serverless-example",
+  "description": "",
+  "version": "0.1.0",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "simple-oauth2": "^4.1.0"
+  },
+  "devDependencies": {
+    "serverless-domain-manager": "^4.1.1",
+    "serverless-layers": "^2.2.4"
+  }
+}
