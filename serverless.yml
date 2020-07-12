@@ -44,6 +44,8 @@ provider:
   package:
     include:
       - src/**
+    exclude:
+      - .vscode/**
 #  exclude:
 #    - exclude-me.js
 #    - exclude-me-dir/**
