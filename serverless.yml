@@ -77,9 +77,19 @@ functions:
       - http:
           path: github
           method: get
+    vpc: &vpc
+      securityGroupIds:
+        - sg-079b066a1153b7881
+        - sg-d4d9f39d
+      subnetIds:
+        - subnet-0a7e7351
+        - subnet-f1c714b9
+        - subnet-f8ce14d3
 
   github_oauth2_callback:
     handler: src/handlers/github/oauth2/callback.handler
+    vpc:
+      <<: *vpc
     events:
       - http:
           path: github/callback
@@ -98,6 +108,8 @@ functions:
 
   github_oauth2_check:
     handler: src/handlers/github/oauth2/check.handler
+    vpc:
+      <<: *vpc
     events:
       - http:
           path: github/check
@@ -107,6 +119,8 @@ functions:
 
   github_oauth2_login:
     handler: src/handlers/github/oauth2/login.handler
+    vpc:
+      <<: *vpc
     events:
       - http:
           path: github/login
@@ -116,6 +130,8 @@ functions:
 
   github_oauth2_revoke:
     handler: src/handlers/github/oauth2/revoke.handler
+    vpc:
+      <<: *vpc
     events:
       - http:
           path: github/revoke
@@ -125,6 +141,8 @@ functions:
 
   github_gists_list:
     handler: src/handlers/github/gists/list.handler
+    vpc:
+      <<: *vpc
     events:
       - http:
           path: documents
@@ -134,6 +152,8 @@ functions:
   
   github_gists_get:
     handler: src/handlers/github/gists/get.handler
+    vpc:
+      <<: *vpc
     events:
       - http:
           path: document/{id}
@@ -143,6 +163,8 @@ functions:
 
   github_gists_post:
     handler: src/handlers/github/gists/post.handler
+    vpc:
+      <<: *vpc
     events:
       - http:
           path: document
@@ -161,6 +183,8 @@ functions:
 
   github_gists_get_image:
     handler: src/handlers/github/gists/getImage.handler
+    vpc:
+      <<: *vpc
     events:
       - http:
           path: github/image/{id}
