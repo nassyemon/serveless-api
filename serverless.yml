@@ -84,7 +84,6 @@ functions:
       subnetIds:
         - subnet-0a7e7351
         - subnet-f1c714b9
-        - subnet-f8ce14d3
 
   github_oauth2_callback:
     handler: src/handlers/github/oauth2/callback.handler
