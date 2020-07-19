@@ -44,6 +44,8 @@ provider:
     API_DOMAIN: ${self:custom.customDomain.domainName}
     GITHUB_OAUTH_CLIENT_ID: ${file(../config/${self:custom.stage}/github.yml):client_id}
     GITHUB_OAUTH_CLIENT_SECRET:  ${file(../config/${self:custom.stage}/github.yml):client_secret}
+    S3_CONTENTS_BUCKET:  ${file(../config/${self:custom.stage}/s3bucket.yml):contents_bucket}
+    S3_UPLOADED_IMAGES_BUCKET:  ${file(../config/${self:custom.stage}/s3bucket.yml):uploaded_images_bucket}
 
   httpApi:
     name: ${self:custom.stage}-${self:service}
@@ -141,6 +143,14 @@ functions:
       - http:
           path: github/image/{id}
           method: get
+  
+  s3_image_list:
+    handler: api/src/handlers/s3/image/list.handler
+    events:
+      - http:
+          path: s3/images
+          method: get
+          cors: true
 
 # resources:
 #   Resources:
