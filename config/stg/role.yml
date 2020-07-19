@@ -1,0 +1,2 @@
+role: arn:aws:iam::448946396910:role/serverless-api-lambda-function-role
+cfnRole: arn:aws:iam::448946396910:role/serverless-api-cloudformation-role

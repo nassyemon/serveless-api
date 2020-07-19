@@ -1,0 +1,9 @@
+{
+  "name": "serveless-api",
+  "description": "",
+  "version": "0.1.0",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "simple-oauth2": "^4.1.0"
+  }
+}
