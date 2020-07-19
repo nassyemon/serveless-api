@@ -1,0 +1,154 @@
+service: serverless-api
+
+plugins:
+  - serverless-layers
+  - serverless-domain-manager
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  customDomain:
+    domainName: ${self:custom.stage}-serverless-api.takanashi.xyz
+    basePath: ''
+    certificateName: '*.takanashi.xyz'
+    endpointType: 'regional'
+    createRoute53Record: true
+    securityPolicy: tls_1_2
+    apiType: rest
+  basePath: ../api
+  srcPath: ../api/src
+  serverless-layers:
+    dependenciesPath: ${self:custom.basePath}/package.json
+    layersDeploymentBucket: serverless-api-lambda-layers
+
+frameworkVersion: "=1.74.1"
+provider:
+  name: aws
+  runtime: nodejs12.x
+  # stackName: 
+  # packageName: 
+  # versionFunctions: true
+  memorySize: 256
+  stage: [dev, stg]
+  region: ap-northeast-1
+  endpointType: REGIONAL
+  description: serverless-managed-api
+  timeout: 30
+  apiGateway:
+    binaryMediaTypes:
+      - 'image/*'
+  role: ${file(../config/${self:custom.stage}/role.yml):role}
+  cfnRole: ${file(../config/${self:custom.stage}/role.yml):cfnRole}
+  logRetentionInDays: 365
+
+  environment:
+    API_DOMAIN: ${self:custom.customDomain.domainName}
+    GITHUB_OAUTH_CLIENT_ID: ${file(../config/${self:custom.stage}/github.yml):client_id}
+    GITHUB_OAUTH_CLIENT_SECRET:  ${file(../config/${self:custom.stage}/github.yml):client_secret}
+
+  httpApi:
+    name: ${self:custom.stage}-${self:service}
+    payload: '2.0'
+    cors:  ${file(../config/common.yml):cors}
+
+  vpc:
+    securityGroupIds: ${file(../config/${self:custom.stage}/network.yml):securityGroupIds}
+    subnetIds: ${file(../config/${self:custom.stage}/network.yml):subnetIds}
+
+package:
+  include:
+    - ${self:custom.basePath}/package.json
+    - ${self:custom.basePath}/package-lock.json
+    - ${self:custom.basePath}/node_modules/**
+    - ${self:custom.srcPath}/**
+  exclude:
+    - '*'
+    - '**/*'
+
+functions:
+  github_oauth2_entry:
+    handler: api/src/handlers/github/oauth2/entry.handler
+    events:
+      - http:
+          path: github
+          method: get
+
+  github_oauth2_callback:
+    handler: api/src/handlers/github/oauth2/callback.handler
+    events:
+      - http:
+          path: github/callback
+          method: get
+
+  github_oauth2_check:
+    handler: api/src/handlers/github/oauth2/check.handler
+    events:
+      - http:
+          path: github/check
+          method: post
+          cors:  ${self:provider.httpApi.cors}
+
+  github_oauth2_login:
+    handler: api/src/handlers/github/oauth2/login.handler
+    events:
+      - http:
+          path: github/login
+          method: post
+          cors:  ${self:provider.httpApi.cors}
+
+  github_oauth2_revoke:
+    handler: api/src/handlers/github/oauth2/revoke.handler
+    events:
+      - http:
+          path: github/revoke
+          method: post
+          cors:  ${self:provider.httpApi.cors}
+
+  github_gists_list:
+    handler: api/src/handlers/github/gists/list.handler
+    events:
+      - http:
+          path: documents
+          method: get
+          cors:  ${self:provider.httpApi.cors}
+  
+  github_gists_get:
+    handler: api/src/handlers/github/gists/get.handler
+    events:
+      - http:
+          path: document/{id}
+          method: get
+          cors:  ${self:provider.httpApi.cors}
+
+  github_gists_post:
+    handler: api/src/handlers/github/gists/post.handler
+    events:
+      - http:
+          path: document
+          method: post
+          cors:  ${self:provider.httpApi.cors}
+
+  github_gists_delete:
+    handler: api/src/handlers/github/gists/delete.handler
+    events:
+      - http:
+          path: document/{id}
+          method: delete
+          cors: true
+
+  github_gists_get_image:
+    handler: api/src/handlers/github/gists/getImage.handler
+    events:
+      - http:
+          path: github/image/{id}
+          method: get
+
+# resources:
+#   Resources:
+#     NewResource:
+#       Type: AWS::S3::Bucket
+#       Properties:
+#         BucketName: serverless-api-app-resources
+#   Outputs:
+#      NewOutput:
+#        Description: "Description for the output"
+#        Value: "Some output value"
